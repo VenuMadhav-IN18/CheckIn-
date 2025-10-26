@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Worker Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f8f9fa; }
+    
+    .profile-card:hover{
+      transform: translateY(-10px) scale(1.05);
+    }
+
+    .navbar { background-color: #0d6efd; }
+    .navbar-brand, .nav-link, .navbar-text { color: white !important; }
+    .profile-card {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-top: 20px;
+      transition: all 0.4s ease;
+      cursor: pointer;
+      transform: translateY(0);
+    }
+    #workerName,#name{
+       text-decoration: underline;
+       text-transform: capitalize;
+       transition: ease-in;
+       font-family: "Lexend", sans-serif;
+      font-optical-sizing: auto;
+      font-weight: 100;
+      font-style: normal;
+    }
+    .profile-pic {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #0d6efd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔹 Navbar -->
+  <!-- 🔹 Navbar -->
+<nav class="navbar navbar-expand-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="#">✅CheckIn</a>
+    <span class="navbar-text mx-auto fs-5">Hi, <span id="workerName">Mark</span> 👋</span>
+    <div class="d-flex">
+      <button class="btn btn-light btn-sm me-2" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️ Settings</button>
+      <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+
+  <!-- 🔹 Profile -->
+  <div class="container">
+    <div class="profile-card d-flex align-items-center">
+      <img src="https://via.placeholder.com/120" alt="Profile" class="profile-pic me-4">
+      <div >
+        <h4 id="name"></h4>
+        <p><strong>Employee Code:</strong> <span id="employee_code"></span></p>
+        <p><strong>Role:</strong> <span id="role"></span></p>
+        <p><strong>Status:</strong> <span id="status" class="badge bg-success">Active</span></p>
+      </div>
+    </div>
+
+    <!-- 🔹 Attendance Buttons -->
+    <div class="text-center mt-4">
+      <button id="checkInBtn" class="btn btn-success me-3">✅ Check-In</button>
+      <button id="checkOutBtn" class="btn btn-warning">🚪 Check-Out</button>
+    </div>
+
+    <!-- 🔹 Attendance History -->
+    <div class="mt-5">
+      <h4>📅 Attendance History</h4>
+      <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+          <tr>
+            <th>Date</th>
+            <th>Check-In</th>
+            <th>Check-Out</th>
+            <th>Location</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody">
+          <tr><td colspan="4" class="text-center">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+ const worker = JSON.parse(localStorage.getItem("worker"));
+
+if (!worker) {
+  alert("No worker info found. Please log in again.");
+  window.location.href = "WorkerLogin.html";
+} else {
+  const workerId = worker.id;
+
+  // Update navbar
+  document.getElementById("workerName").textContent = worker.emp_name;
+
+  // Load worker profile
+  async function loadWorker() {
+    const res = await fetch(`/api/workers/${workerId}`);
+    const data = await res.json();
+    document.getElementById('name').textContent = data.name;
+    document.getElementById('employee_code').textContent = data.employee_code;
+    document.getElementById('role').textContent = data.role;
+  }
+
+  // Load attendance history
+  async function loadHistory() {
+    const res = await fetch(`/api/attendance/${workerId}`);
+    const data = await res.json();
+    const tbody = document.getElementById("historyTableBody");
+    tbody.innerHTML = "";
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="text-center">No attendance yet</td></tr>`;
+      return;
+    }
+    data.forEach(r => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${r.date}</td>
+          <td>${r.checkin_time || "-"}</td>
+          <td>${r.checkout_time || "-"}</td>
+          <td>${(r.latitude && r.longitude)? `${parseFloat(r.latitude).toFixed(4)}, ${parseFloat(r.longitude).toFixed(4)}`: "N/A"}</td>
+        </tr>`;
+    });
+  }
+
+  // Attendance buttons
+  function getLocationAndSend(action) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        const data = {
+          worker_id: workerId,
+          action,
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude
+        };
+        const res = await fetch("/api/attendance", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        alert(result.message);
+        loadHistory();
+      }, () => alert("⚠️ Please enable location to mark attendance!"));
+    } else {
+      alert("Geolocation not supported");
+    }
+  }
+
+  document.getElementById("checkInBtn").addEventListener("click", () => getLocationAndSend("checkin"));
+  document.getElementById("checkOutBtn").addEventListener("click", () => getLocationAndSend("checkout"));
+
+  // Load data on page load
+  loadWorker();
+  loadHistory();
+
+  // Logout
+  window.logout = function() {
+    if (confirm("Are you sure you want to logout?")) {
+      localStorage.removeItem("worker");
+      window.location.href = "MainInterface.html";
+    }
+  };
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Worker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4 bg-light">
+  <div class="container">
+    <h3 class="mb-4">Edit Worker</h3>
+    <form id="editWorkerForm">
+      <input type="hidden" id="worker_id">
+
+      <div class="mb-3">
+        <label>Name</label>
+        <input type="text" id="name" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Site</label>
+        <input type="text" id="site" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Role</label>
+        <input type="text" id="role" class="form-control" required>
+      </div>
+      <div class="mb-3">
+        <label>Status</label>
+        <select id="status" class="form-select">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-success">Update Worker</button>
+      <a href="AdminDashboard.html" class="btn btn-secondary ms-2">Cancel</a>
+    </form>
+  </div>
+
+<script>
+// Get worker ID from URL
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+document.getElementById("worker_id").value = id;
+
+// Fetch existing worker data
+async function loadWorker() {
+  try {
+    const res = await fetch(`/api/workers/${id}`);
+    if (!res.ok) throw new Error("Worker not found");
+    const worker = await res.json();
+    document.getElementById("name").value = worker.name;
+    document.getElementById("site").value = worker.site;
+    document.getElementById("role").value = worker.role;
+    document.getElementById("status").value = worker.status;
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+loadWorker();
+
+// Handle form submission
+document.getElementById("editWorkerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const updatedWorker = {
+    name: document.getElementById("name").value,
+    site: document.getElementById("site").value,
+    role: document.getElementById("role").value,
+    status: document.getElementById("status").value
+  };
+
+  try {
+    const res = await fetch(`/api/workers/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updatedWorker)
+    });
+
+    const data = await res.json();
+    alert(data.message);
+
+    if (res.ok) window.location.href = "AdminDashboard.html";
+  } catch (err) {
+    console.error("❌ Update error:", err);
+    alert("Something went wrong");
+  }
+});
+</script>
+
+
+</body>
+</html>
