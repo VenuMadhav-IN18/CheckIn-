@@ -1,279 +1,826 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - CheckIn+</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background-color: #f8f9fa; }
-    .navbar { background-color: #343a40; }
-    .navbar-brand { color: white !important; font-weight: bold; letter-spacing: 1px; }
-    .summary-card { border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .nav-icon { color: white; font-size: 20px; margin-right: 20px; cursor: pointer; position: relative; }
-    .notification-badge { position: absolute; top: -6px; right: 12px; background-color: red; color: white;
-      border-radius: 50%; font-size: 11px; padding: 2px 5px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Check-In System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .admin-info {
+            text-align: right;
+        }
+
+        .admin-name {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .nav-tab {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            background: rgba(255,255,255,0.3);
+            font-weight: 600;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .card p {
+            color: #667eea;
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-box {
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            width: 300px;
+            font-size: 1em;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .status-active {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .status-inactive {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            border-radius: 4px;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .message {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .admin-info {
+                text-align: center;
+            }
+            
+            .nav-tabs {
+                justify-content: center;
+            }
+            
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            table {
+                font-size: 0.9em;
+            }
+            
+            .action-btns {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <!--  NAVBAR -->
-  <nav class="navbar navbar-expand-lg">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">✅ CheckIn+</a>
-      <div class="d-flex align-items-center ms-auto">
-        <div class="nav-icon position-relative" id="notifBtn">
-          🔔<span class="notification-badge" id="notifCount">0</span>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">Admin Dashboard</div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <div class="admin-info">
+                    <div class="admin-name" id="adminName">Loading...</div>
+                    <div class="nav-tabs">
+                        <button class="nav-tab active" onclick="showTab('workers')">Workers</button>
+                        <button class="nav-tab" onclick="showTab('attendance')">Attendance</button>
+                        <button class="nav-tab" onclick="showTab('reports')">Reports</button>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
         </div>
-        <div class="dropdown">
-          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
-            <i class="fas fa-user-circle"></i> Admin
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#">View Profile</a></li>
-            <li><a class="dropdown-item" href="#">Change Password</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Logout</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  <!--  MAIN CONTENT -->
-  <div class="container mt-4">
-    <h2 class="mb-4">Admin Dashboard</h2>
-
-    <!--  DASHBOARD SUMMARY -->
-    <div class="row mt-4">
-      <div class="col-md-3">
-        <div class="card summary-card p-3 text-center bg-primary text-white">
-          <h4 id="totalWorkers">0</h4>
-          <p>Total Workers</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card summary-card p-3 text-center bg-success text-white">
-          <h4 id="presentToday">0</h4>
-          <p>Present Today</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card summary-card p-3 text-center bg-danger text-white">
-          <h4 id="absentToday">0</h4>
-          <p>Absent</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card summary-card p-3 text-center bg-warning text-dark">
-          <h4 id="pendingApprovals">0</h4>
-          <p>Pending Approvals</p>
-        </div>
-      </div>
     </div>
 
-    <!-- GLOBAL ATTENDANCE -->
-    <div class="card mt-4 mb-4">
-      <div class="card-header">Global Attendance</div>
-      <div class="card-body">
-        <input type="date" id="attendanceDate" class="form-control w-auto d-inline">
-        <button class="btn btn-info ms-2" onclick="fetchAttendance()">Get Attendance</button>
-        <table class="table mt-3">
-          <thead><tr><th>Name</th><th>Role</th><th>Site</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead>
-          <tbody id="attendanceTable"></tbody>
-        </table>
-      </div>
+    <div class="container">
+        <div class="dashboard-cards">
+            <div class="card">
+                <h3>Total Workers</h3>
+                <p id="totalWorkers">0</p>
+            </div>
+            <div class="card">
+                <h3>Present Today</h3>
+                <p id="presentToday">0</p>
+            </div>
+            <div class="card">
+    <h3>Absent Today</h3>
+    <p id="absentToday">0</p>
+</div>
+
+            <div class="card">
+                <h3>Active Sites</h3>
+                <p id="activeSites">0</p>
+            </div>
+            <div class="card">
+                <h3>This Month</h3>
+                <p id="monthAttendance">0%</p>
+            </div>
+        </div>
+
+        <!-- Workers Tab -->
+        <div id="workersTab" class="tab-content active">
+            <div class="section">
+                <div class="action-bar">
+                    <h3>Worker Management</h3>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <input type="text" id="searchWorker" class="search-box" placeholder="Search workers...">
+                        <button class="btn" onclick="showAddWorkerModal()">Add Worker</button>
+                    </div>
+                </div>
+
+                <div class="message" id="message"></div>
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div>Loading...</div>
+                </div>
+
+                <div id="workersTable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Employee Code</th>
+                                <th>Site</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workersBody">
+                            <!-- Workers data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Tab -->
+        <div id="attendanceTab" class="tab-content">
+            <div class="section">
+                <div class="action-bar">
+                    <h3>Attendance Overview</h3>
+                    <div>
+                        <input type="date" id="attendanceDate" class="search-box">
+                        <button class="btn" onclick="loadAttendanceData()">Load Data</button>
+                    </div>
+                </div>
+
+                <div class="loading" id="attendanceLoading">
+                    <div class="spinner"></div>
+                    <div>Loading attendance data...</div>
+                </div>
+
+                <div id="attendanceTable">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Worker Name</th>
+                                <th>Role</th>
+                                <th>Site</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceBody">
+                            <!-- Attendance data will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reportsTab" class="tab-content">
+            <div class="section">
+                <h3>Reports & Analytics</h3>
+                <p>Reports feature coming soon...</p>
+            </div>
+        </div>
     </div>
 
-    <!-- PENDING APPROVALS -->
-    <div class="mt-5">
-      <h4>Pending Approvals</h4>
-      <table class="table table-bordered" id="pendingTable">
-        <thead class="table-secondary">
-          <tr><th>ID</th><th>Name</th><th>Site</th><th>Role</th><th>Action</th></tr>
-        </thead>
-        <tbody id="pendingBody">
-          <tr><td colspan="5" class="text-center">Loading...</td></tr>
-        </tbody>
-      </table>
+    <!-- Add Worker Modal -->
+    <div id="addWorkerModal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Worker</h3>
+            <form id="addWorkerForm">
+                <div class="form-group">
+                    <label for="workerName">Full Name</label>
+                    <input type="text" id="workerName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="employeeCode">Employee Code</label>
+                    <input type="text" id="employeeCode" name="employee_code" required>
+                </div>
+                <div class="form-group">
+                    <label for="workerMobile">Mobile</label>
+                    <input type="tel" id="workerMobile" name="mobile">
+                </div>
+                <div class="form-group">
+                    <label for="workerSite">Site</label>
+                    <input type="text" id="workerSite" name="site" required>
+                </div>
+                <div class="form-group">
+                    <label for="workerRole">Role</label>
+                    <input type="text" id="workerRole" name="role" required>
+                </div>
+                <div class="form-group">
+                    <label for="workerPin">PIN</label>
+                    <input type="password" id="workerPin" name="pin" required maxlength="4">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeAddWorkerModal()">Cancel</button>
+                    <button type="submit" class="btn">Add Worker</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!--  WORKER MANAGEMENT -->
-    <div class="mt-5">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4>Worker Management</h4>
-        <a href="AddWorkers.html"><button class="btn btn-primary">+ Add Worker</button></a>
-      </div>
-      <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-          <tr><th>ID</th><th>Name</th><th>Site</th><th>Role</th><th>Status</th><th>Action</th></tr>
-        </thead>
-        <tbody id="workerBody"><tr><td colspan="6" class="text-center">Loading...</td></tr></tbody>
-      </table>
-    </div>
-  </div>
+    <script>
+        let admin = null;
 
- 
-  <div class="modal fade" id="notifModal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header"><h5 class="modal-title">Notifications</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-        <div class="modal-body" id="notifList"><p>No new notifications</p></div>
-      </div>
-    </div>
-  </div>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if admin is logged in
+            const adminData = localStorage.getItem('admin');
+            if (!adminData) {
+                window.location.href = 'admin-login.html';
+                return;
+            }
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-   
-    window.onload = function() {
-      loadWorkers();
-      loadPending();
-      loadDashboardStats();
-    };
-    async function loadWorkers() {
-      try {
-        const res = await fetch("http://localhost:3000/get-workers");
-        const workers = await res.json();
-        const tbody = document.getElementById("workerBody");
-        tbody.innerHTML = "";
+            admin = JSON.parse(adminData);
+            loadAdminInfo();
+            loadDashboardStats();
+            loadWorkers();
+        });
 
-        if (!workers.length) {
-          tbody.innerHTML = `<tr><td colspan="6" class="text-center">No workers found</td></tr>`;
-          return;
+        function loadAdminInfo() {
+            document.getElementById('adminName').textContent = `Welcome, ${admin.username}`;
         }
 
-        workers.forEach(w => {
-          tbody.insertAdjacentHTML("beforeend", `
-            <tr>
-              <td>${w.worker_id}</td>
-              <td>${w.name}</td>
-              <td>${w.site}</td>
-              <td>${w.role}</td>
-              <td>${w.status}</td>
-              <td>
-                <button class="btn btn-warning btn-sm" onclick="editWorker(${w.worker_id})">Edit</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteWorker(${w.worker_id})">Delete</button>
-              </td>
-            </tr>
-          `);
-        });
-      } catch (err) {
-        console.error(" Error loading workers:", err);
-      }
-    }
-
-    // Delete Worker
-    async function deleteWorker(id) {
-      if (!confirm("Are you sure you want to delete this worker?")) return;
-      try {
-        const res = await fetch(`http://localhost:3000/delete-worker/${id}`, { method: "DELETE" });
-        const data = await res.json();
-        if (res.ok) { alert(data.message); loadWorkers(); }
-        else alert("Failed: " + data.error);
-      } catch (err) {
-        alert("Server error.");
-      }
-    }
-
-    function editWorker(id) { window.location.href = `editWorker.html?id=${id}`; }
-
-    // Load Pending Approvals
-    async function loadPending() {
-      try {
-        const res = await fetch("http://localhost:3000/pending-approvals");
-        const data = await res.json();
-        const tbody = document.getElementById("pendingBody");
-        tbody.innerHTML = "";
-
-        if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="5" class="text-center">No pending approvals</td></tr>`;
-          document.getElementById("notifCount").innerText = "0";
-          document.getElementById("pendingApprovals").innerText = "0";
-          return;
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/dashboard-stats');
+                const stats = await response.json();
+                
+                document.getElementById('totalWorkers').textContent = stats.totalWorkers;
+                document.getElementById('presentToday').textContent = stats.presentToday;
+                document.getElementById('absentToday').textContent = stats.absentToday;
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
         }
 
-        document.getElementById("notifCount").innerText = data.length;
-        document.getElementById("pendingApprovals").innerText = data.length;
-
-        data.forEach(w => {
-          tbody.insertAdjacentHTML("beforeend", `
-            <tr>
-              <td>${w.worker_id}</td>
-              <td>${w.name}</td>
-              <td>${w.site}</td>
-              <td>${w.role}</td>
-              <td>
-                <button class="btn btn-success btn-sm" onclick="approveWorker(${w.worker_id})">Approve</button>
-                <button class="btn btn-danger btn-sm" onclick="rejectWorker(${w.worker_id})">Reject</button>
-              </td>
-            </tr>
-          `);
-        });
-      } catch (err) { console.error(err); }
-    }
-
-    async function approveWorker(id) {
-      await fetch(`http://localhost:3000/approve-worker/${id}`, { method: "PUT" });
-      alert("Worker Approved");
-      loadPending(); loadWorkers(); loadDashboardStats();
-    }
-
-    async function rejectWorker(id) {
-      await fetch(`http://localhost:3000/reject-worker/${id}`, { method: "PUT" });
-      alert("Worker Rejected");
-      loadPending(); loadWorkers(); loadDashboardStats();
-    }
-
-    //  Attendance Fetch
-    async function fetchAttendance() {
-      const date = document.getElementById("attendanceDate").value;
-      const tbody = document.getElementById("attendanceTable");
-      tbody.innerHTML = "";
-      try {
-        const res = await fetch(`http://localhost:3000/global-attendance?date=${date}`);
-        const data = await res.json();
-        if (!data.length) {
-          tbody.innerHTML = "<tr><td colspan='6'>No attendance data found.</td></tr>";
-          return;
+        async function loadWorkers() {
+            try {
+                showLoading(true);
+                const response = await fetch('/get-workers');
+                const workers = await response.json();
+                
+                const tbody = document.getElementById('workersBody');
+                tbody.innerHTML = '';
+                
+                workers.forEach(worker => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${worker.code}</td>
+                        <td>${worker.name}</td>
+                        <td>${worker.employee_code}</td>
+                        <td>${worker.site}</td>
+                        <td>${worker.role}</td>
+                        <td class="status-${worker.status.toLowerCase()}">${worker.status}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-sm btn-edit" onclick="editWorker('${worker._id}')">Edit</button>
+                                <button class="btn btn-sm btn-delete" onclick="deleteWorker('${worker._id}')">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                showMessage('Error loading workers: ' + error.message, 'error');
+            } finally {
+                showLoading(false);
+            }
         }
-        data.forEach(a => {
-          tbody.insertAdjacentHTML("beforeend", `
-            <tr>
-              <td>${a.name || "-"}</td>
-              <td>${a.role || "-"}</td>
-              <td>${a.site || "-"}</td>
-              <td>${a.checkin_time || "-"}</td>
-              <td>${a.checkout_time || "-"}</td>
-              <td>${a.status || "-"}</td>
-            </tr>
-          `);
-        });
-      } catch (err) { console.error("Attendance error:", err); }
-    }
 
-  async function loadDashboardStats() {
+        async function loadAttendanceData() {
+            const date = document.getElementById('attendanceDate').value;
+            if (!date) return;
+
+            try {
+                document.getElementById('attendanceLoading').style.display = 'block';
+                
+                const response = await fetch(`/superadmin/attendance?date=${date}`);
+                const attendance = await response.json();
+                
+                const tbody = document.getElementById('attendanceBody');
+                tbody.innerHTML = '';
+                
+                attendance.forEach(record => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${record.worker_name}</td>
+                        <td>${record.role}</td>
+                        <td>${record.site}</td>
+                        <td>${record.checkin_time ? new Date(record.checkin_time).toLocaleTimeString() : '-'}</td>
+                        <td>${record.checkout_time ? new Date(record.checkout_time).toLocaleTimeString() : '-'}</td>
+                        <td class="status-${record.status.toLowerCase().replace(' ', '-')}">${record.status}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                showMessage('Error loading attendance data: ' + error.message, 'error');
+            } finally {
+                document.getElementById('attendanceLoading').style.display = 'none';
+            }
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all nav tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Add active class to clicked nav tab
+            event.target.classList.add('active');
+            
+            // Load tab-specific data
+            if (tabName === 'attendance') {
+                loadAttendanceData();
+            }
+        }
+
+        function showAddWorkerModal() {
+            document.getElementById('addWorkerModal').style.display = 'block';
+        }
+
+        function closeAddWorkerModal() {
+            document.getElementById('addWorkerModal').style.display = 'none';
+            document.getElementById('addWorkerForm').reset();
+        }
+
+        document.getElementById('addWorkerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const workerData = {
+                name: formData.get('name'),
+                employee_code: formData.get('employee_code'),
+                mobile: formData.get('mobile'),
+                site: formData.get('site'),
+                role: formData.get('role'),
+                pin: formData.get('pin')
+            };
+            
+            try {
+                const response = await fetch('http://localhost:3000/add-worker', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(workerData)
+                });
+                
+                const data = await response.json();
+                console.log("🔍 Backend response:", data);
+
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    closeAddWorkerModal();
+                    loadWorkers();
+                    loadDashboardStats();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error adding worker: ' + error.message, 'error');
+            }
+        });
+
+        async function deleteWorker(workerId) {
+            if (!confirm('Are you sure you want to delete this worker?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/delete-worker/${workerId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showMessage(data.message, 'success');
+                    loadWorkers();
+                    loadDashboardStats();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting worker: ' + error.message, 'error');
+            }
+        }
+        async function editWorker(workerId) {
   try {
-    const res = await fetch("http://localhost:3000/dashboard-stats");
-    const stats = await res.json();
+    const response = await fetch(`/api/workers/${workerId}`);
+    const worker = await response.json();
 
-    document.getElementById("totalWorkers").innerText = stats.totalWorkers ?? 0;
-    document.getElementById("presentToday").innerText = stats.presentToday ?? 0;
-    document.getElementById("absentToday").innerText = stats.absentToday ?? 0;
-    document.getElementById("pendingApprovals").innerText = stats.pendingApprovals ?? 0;
+    if (!response.ok) {
+      return showMessage("Worker not found", "error");
+    }
+
+    // Fill modal form with existing worker data
+    document.getElementById('workerName').value = worker.name;
+    document.getElementById('employeeCode').value = worker.employee_code;
+    document.getElementById('workerMobile').value = worker.mobile || '';
+    document.getElementById('workerSite').value = worker.site;
+    document.getElementById('workerRole').value = worker.role;
+
+    // Show modal
+    document.getElementById('addWorkerModal').style.display = 'block';
+
+    // Change button text to Update Worker
+    const submitBtn = document.querySelector('#addWorkerForm button[type="submit"]');
+    submitBtn.textContent = "Update Worker";
+
+    // Temporarily change submit behavior
+    const form = document.getElementById('addWorkerForm');
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const updatedData = {
+        name: document.getElementById('workerName').value,
+        site: document.getElementById('workerSite').value,
+        role: document.getElementById('workerRole').value,
+        status: "Active"
+      };
+
+      const updateRes = await fetch(`/api/workers/${workerId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedData)
+      });
+
+      const data = await updateRes.json();
+
+      if (updateRes.ok) {
+        showMessage("Worker updated successfully!", "success");
+        closeAddWorkerModal();
+        loadWorkers();
+      } else {
+        showMessage(data.error || "Error updating worker", "error");
+      }
+
+      // Reset form submit behavior
+      form.onsubmit = null;
+    };
   } catch (error) {
-    console.error("Error fetching dashboard stats:", error);
+    showMessage("Error loading worker data: " + error.message, "error");
   }
 }
-    document.getElementById("notifBtn").addEventListener("click", () => {
-      new bootstrap.Modal(document.getElementById("notifModal")).show();
-    });
 
-    function logout() {
-      alert("Logged out successfully!");
-      window.location.href = "MainInterface.html";
-    }
-    
-  </script>
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type}`;
+            message.style.display = 'block';
+            
+            setTimeout(() => {
+                message.style.display = 'none';
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function logout() {
+            localStorage.removeItem('admin');
+            window.location.href = 'admin-login.html';
+        }
+
+        // Search functionality
+        document.getElementById('searchWorker').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#workersBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('addWorkerModal');
+            if (e.target === modal) {
+                closeAddWorkerModal();
+            }
+        });
+    </script>
 </body>
 </html>

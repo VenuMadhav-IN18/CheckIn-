@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance History</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f9fa;
+      padding: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+    th {
+      background: #667eea;
+      color: white;
+    }
+    tr:hover {
+      background: #f1f3ff;
+    }
+  </style>
+</head>
+<body>
+  <h2>Attendance History</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Check-In</th>
+        <th>Check-Out</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="attendanceBody">
+      <tr><td colspan="4">Loading...</td></tr>
+    </tbody>
+  </table>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const workerData = localStorage.getItem('worker');
+      if (!workerData) {
+        window.location.href = 'worker-login.html';
+        return;
+      }
+
+      const worker = JSON.parse(workerData);
+      const response = await fetch(`/api/attendance/${worker.id}`);
+      const attendance = await response.json();
+
+      const tbody = document.getElementById('attendanceBody');
+      tbody.innerHTML = '';
+
+      attendance.forEach(record => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${record.date}</td>
+          <td>${record.checkin_time || '-'}</td>
+          <td>${record.checkout_time || '-'}</td>
+          <td>${record.checkin_time ? 'Present' : 'Absent'}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+  </script>
+</body>
+</html>
