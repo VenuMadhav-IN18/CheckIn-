@@ -6,6 +6,7 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const connectDB = require("./config/db");
 
+// Import models
 const Admin = require("./model/Admin");
 const Worker = require("./model/Worker");
 const Site = require("./model/Site");
@@ -13,22 +14,24 @@ const Attendance = require("./model/Attendence");
 
 const app = express();
 
-// ✅ Middlewares
+// Connect to MongoDB
+connectDB();
+
+// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.status(200).send("✅ CheckIn Backend Live");
+});
+// Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ Health check (for Railway)
-app.get("/health", (req, res) => {
-  res.status(200).send("✅ CheckIn backend is alive and running!");
-});
-
-// ✅ Root route (temporary check)
+// 🏠 Default route - serve MainInterface.html
 app.get("/", (req, res) => {
-  res.status(200).send("✅ Root route working fine!");
+  res.sendFile(path.join(__dirname, "public", "MainInterface.html"));
 });
-
 
 // Add these routes to handle .html requests
 app.get("/super-admin-login.html", (req, res) => {
@@ -517,21 +520,25 @@ app.post("/add-worker", async (req, res) => {
 });
 
 
-// ✅ Start server FIRST
+// ✅ Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// ✅ 404 handler — Keep this LAST
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+
+// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`📊 Database: MongoDB`);
 });
 
-// ✅ Connect to MongoDB AFTER server starts
-connectDB();
 
-// 🧠 Example simple test route
-app.get("/test", (req, res) => {
-  res.json({ message: "Server is up and MongoDB connected!" });
-});
 
-// ✅ Fallback for unmatched routes
-app.use((req, res) => {
-  res.status(404).json({ error: "Route not found" });
-});
+
