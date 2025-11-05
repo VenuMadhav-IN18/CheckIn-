@@ -22,13 +22,13 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
+app.get("/health", (req, res) => {
+  res.status(200).send("✅ CheckIn Backend Live");
+});
 // Serve static files from public directory
 app.use(express.static(path.join(__dirname, "public")));
 
 // 🏠 Default route - serve MainInterface.html
-app.get("/health", (req, res) => {
-  res.status(200).send("✅ CheckIn Backend Live");
-});
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "MainInterface.html"));
 });
