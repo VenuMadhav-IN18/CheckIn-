@@ -30,8 +30,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // 🏠 Default route - serve MainInterface.html
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "MainInterface.html"));
+  res.send("✅ Root route working fine!");
 });
+
 
 // Add these routes to handle .html requests
 app.get("/super-admin-login.html", (req, res) => {
