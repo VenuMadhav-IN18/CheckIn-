@@ -64,9 +64,9 @@
 </div>
 </div>
 <script>
-    // addworker.js
+    
 document.getElementById("addWorker").addEventListener("submit", async (e) => {
-  e.preventDefault(); // stop default reload
+  e.preventDefault(); 
 
   const formData = {
     name: document.getElementById("name").value,
@@ -85,14 +85,14 @@ document.getElementById("addWorker").addEventListener("submit", async (e) => {
     });
 
     if (res.ok) {
-      alert("✅ Worker added successfully!");
-      window.location.href = "AdminDashboard.html"; // redirect back
+      alert("Worker added successfully!");
+      window.location.href = "AdminDashboard.html";
     } else {
-      alert("❌ Failed to add worker.");
+      alert("Failed to add worker.");
     }
   } catch (error) {
     console.error("Error:", error);
-    alert("⚠️ Something went wrong.");
+    alert("Something went wrong.");
   }
 });
 

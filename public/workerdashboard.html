@@ -61,7 +61,7 @@
   <!-- 🔹 Profile -->
   <div class="container">
     <div class="profile-card d-flex align-items-center">
-      <img src="https://via.placeholder.com/120" alt="Profile" class="profile-pic me-4">
+      <img src="Assets/workers.png" alt="Profile" class="profile-pic me-4">
       <div >
         <h4 id="name"></h4>
         <p><strong>Employee Code:</strong> <span id="employee_code"></span></p>
@@ -103,11 +103,8 @@ if (!worker) {
   window.location.href = "WorkerLogin.html";
 } else {
   const workerId = worker.id;
-
-  // Update navbar
   document.getElementById("workerName").textContent = worker.emp_name;
 
-  // Load worker profile
   async function loadWorker() {
     const res = await fetch(`/api/workers/${workerId}`);
     const data = await res.json();
@@ -116,7 +113,6 @@ if (!worker) {
     document.getElementById('role').textContent = data.role;
   }
 
-  // Load attendance history
   async function loadHistory() {
     const res = await fetch(`/api/attendance/${workerId}`);
     const data = await res.json();
@@ -137,7 +133,6 @@ if (!worker) {
     });
   }
 
-  // Attendance buttons
   function getLocationAndSend(action) {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (pos) => {
@@ -155,7 +150,7 @@ if (!worker) {
         const result = await res.json();
         alert(result.message);
         loadHistory();
-      }, () => alert("⚠️ Please enable location to mark attendance!"));
+      }, () => alert(" Please enable location to mark attendance!"));
     } else {
       alert("Geolocation not supported");
     }
@@ -164,11 +159,9 @@ if (!worker) {
   document.getElementById("checkInBtn").addEventListener("click", () => getLocationAndSend("checkin"));
   document.getElementById("checkOutBtn").addEventListener("click", () => getLocationAndSend("checkout"));
 
-  // Load data on page load
   loadWorker();
   loadHistory();
 
-  // Logout
   window.logout = function() {
     if (confirm("Are you sure you want to logout?")) {
       localStorage.removeItem("worker");

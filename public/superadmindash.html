@@ -9,19 +9,26 @@
 <div id="messageBox" class="alert d-none" role="alert"></div>
 <div class="container mt-4">
   <h2 class="mb-4">Super Admin Dashboard</h2>
+  <button id="logoutBtn" style="position: fixed;top: 12px;right: 15px;background-color: #ff4d4d;color: white;border: none;
+  padding: 6px 10px;font-size: 13px;border-radius: 6px;cursor: pointer;box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+"> Logout</button>
   <div class="card mb-4">
     <div class="card-header">Admin Management</div>
+    
+
     <div class="card-body">
       <form id="addAdminForm" class="mb-3">
         <input type="text" class="form-control mb-2" id="adminName" placeholder="Admin Name" required>
         <input type="email" class="form-control mb-2" id="adminEmail" placeholder="Admin Email" required>
         <input type="password" class="form-control mb-2" id="adminPass" placeholder="Password" required>
-        <button type="submit" class="btn btn-primary" >Add Admin</button>
+        <button type="submit" class="btn btn-primary">Add Admin</button>
       </form>
+
       <button class="btn btn-secondary" onclick="fetchAdmins()">View Admins</button>
       <ul id="adminsList" class="list-group mt-3"></ul>
     </div>
   </div>
+
   <div class="card mb-4">
     <div class="card-header">Site Management</div>
     <div class="card-body">
@@ -32,6 +39,7 @@
       </form>
     </div>
   </div>
+
   <div class="card mb-4">
     <div class="card-header">Global Attendance</div>
     <div class="card-body">
@@ -46,46 +54,147 @@
 </div>
 
 <script>
-  // Handle Add Admin form submission
-  const form = document.getElementById('addAdminForm');
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
 
-    const adminName = document.getElementById('adminName').value.trim();
-    
-    const adminPass = document.getElementById('adminPass').value.trim();
+const baseURL = "/superadmin"; 
 
-    fetch('/register', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ adminName, adminPass })
-    })
-    .then(res => res.json())
-    .then(data => {
-    if (data.message) {
-      showMessage(data.message, 'success');
-      form.reset(); // optional: clear form
-    } else if (data.error) {
-        showMessage(data.error, 'danger');
-    } else {
-        showMessage('Unexpected response', 'warning');
-    }
-  })
-  .catch(err => showMessage('⚠️ Request failed: ' + err.message, 'danger'));
-
-function showMessage(text, type = 'success') {
-  const box = document.getElementById('messageBox');
-  // Clear previous classes
+function showMessage(text, type = "success") {
+  const box = document.getElementById("messageBox");
   box.className = `alert alert-${type} mt-2`;
   box.textContent = text;
-  // Show message
-  box.classList.remove('d-none');
-  // Hide after a few seconds
-  setTimeout(() => {
-    box.classList.add('d-none');
-  }, 4000);
+  box.classList.remove("d-none");
+  setTimeout(() => box.classList.add("d-none"), 4000);
 }
+
+// Add Admin
+const addAdminForm = document.getElementById("addAdminForm");
+addAdminForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const adminName = document.getElementById("adminName").value.trim();
+  const adminEmail = document.getElementById("adminEmail").value.trim();
+  const adminPass = document.getElementById("adminPass").value.trim();
+
+  try {
+    const res = await fetch(`${baseURL}/add-admin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ adminName, adminEmail, adminPass }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showMessage(data.message || "Admin added", "success");
+      addAdminForm.reset();
+      fetchAdmins(); 
+    } else {
+      showMessage(data.error || JSON.stringify(data), "danger");
+    }
+  } catch (err) {
+    showMessage("Request failed: " + err.message, "danger");
+  }
 });
+
+// View Admins
+async function fetchAdmins() {
+  try {
+    const res = await fetch(`${baseURL}/admins`);
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({error:res.statusText}));
+      showMessage("Failed to load admins: " + (err.error || res.statusText), "danger");
+      return;
+    }
+    const data = await res.json();
+    const list = document.getElementById("adminsList");
+    list.innerHTML = "";
+    if (!data || data.length === 0) {
+      list.innerHTML = `<li class="list-group-item">No admins found</li>`;
+      return;
+    }
+    data.forEach((admin) => {
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-start";
+      li.innerHTML = `<div><strong>${admin.username}</strong><div class="small">${admin.email_id || 'No email'}</div></div>
+                      <div class="small text-muted">Created: ${admin.created_at ? new Date(admin.created_at).toLocaleString() : '-'}</div>`;
+      list.appendChild(li);
+    });
+  } catch (err) {
+    showMessage("Failed to fetch admins: " + err.message, "danger");
+  }
+}
+
+// Add Site
+const addSiteForm = document.getElementById("addSiteForm");
+addSiteForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const site_name = document.getElementById("siteName").value.trim();
+  const location = document.getElementById("siteLocation").value.trim();
+
+  try {
+    const res = await fetch(`${baseURL}/add-site`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ site_name, location }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showMessage(data.message || "Site added", "success");
+      addSiteForm.reset();
+    } else {
+      showMessage(data.error || JSON.stringify(data), "danger");
+    }
+  } catch (err) {
+    showMessage("Request failed: " + err.message, "danger");
+  }
+});
+
+// Fetch Attendance
+async function fetchAttendance() {
+  const date = document.getElementById("attendanceDate").value;
+  if (!date) {
+    showMessage("Please select a date", "warning");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${baseURL}/attendance?date=${encodeURIComponent(date)}`);
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({error:res.statusText}));
+      showMessage("Failed to load attendance: " + (err.error || res.statusText), "danger");
+      return;
+    }
+    const data = await res.json();
+    const tbody = document.getElementById("attendanceTable");
+    tbody.innerHTML = "";
+    if (!data || data.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='6'>No records found</td></tr>";
+      return;
+    }
+    data.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.worker_name || "-"}</td>
+        <td>${row.role || "-"}</td>
+        <td>${row.site_name || "-"}</td>
+        <td>${row.check_in ? new Date(row.check_in).toLocaleTimeString() : "-"}</td>
+        <td>${row.check_out ? new Date(row.check_out).toLocaleTimeString() : "-"}</td>
+        <td>${row.status || "-"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    showMessage("Failed to load attendance: " + err.message, "danger");
+  }
+}
+// --- Super Admin Logout ---
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  localStorage.removeItem("superAdmin");
+  sessionStorage.clear();
+
+  alert(" Logged out successfully!");
+  window.location.href = "MainInterface.html"; // or your login page path
+});
+
+// Auto load admins on page open
+fetchAdmins();
 </script>
+
 </body>
 </html>

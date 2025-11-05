@@ -3,295 +3,277 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Admin Dashboard - CheckIn+</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    .content {
-      
-      padding: 20px;
-    }
-    .topbar {
-      background-color: white;
-      padding: 10px 20px;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    .summary-card {
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    
-   
-    .navbar {
-      background-color: #343a40;
-    }
-    .navbar-brand {
-      color: white !important;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-    .nav-icon {
-      color: white;
-      font-size: 20px;
-      margin-right: 20px;
-      cursor: pointer;
-      position: relative;
-    }
-    .nav-icon:hover {
-      color: #ffc107;
-    }
-    .notification-badge {
-      position: absolute;
-      top: -6px;
-      right: 12px;
-      background-color: red;
-      color: white;
-      border-radius: 50%;
-      font-size: 11px;
-      padding: 2px 5px;
-    }
-  
+    body { background-color: #f8f9fa; }
+    .navbar { background-color: #343a40; }
+    .navbar-brand { color: white !important; font-weight: bold; letter-spacing: 1px; }
+    .summary-card { border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .nav-icon { color: white; font-size: 20px; margin-right: 20px; cursor: pointer; position: relative; }
+    .notification-badge { position: absolute; top: -6px; right: 12px; background-color: red; color: white;
+      border-radius: 50%; font-size: 11px; padding: 2px 5px; }
   </style>
 </head>
+
 <body>
-<nav class="navbar navbar-expand-lg">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">✅CheckIn+</a>
-    
-    <div class="d-flex align-items-center ms-auto">
-      
-      <div class="nav-icon position-relative" id="notifBtn">
-        <i class="fas fa-bell">🔔</i>
-        <span class="notification-badge" id="notifCount">3</span>
-      </div>
-
-     
-      
-
-      <!-- Profile -->
-      <div class="dropdown">
-        <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="fas fa-user-circle"></i> Admin
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end">
-          <li><a class="dropdown-item" href="#">View Profile</a></li>
-          <li><a class="dropdown-item" href="#">Change Password</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Logout</a></li>
-        </ul>
+  <!--  NAVBAR -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">✅ CheckIn+</a>
+      <div class="d-flex align-items-center ms-auto">
+        <div class="nav-icon position-relative" id="notifBtn">
+          🔔<span class="notification-badge" id="notifCount">0</span>
+        </div>
+        <div class="dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="fas fa-user-circle"></i> Admin
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="#">View Profile</a></li>
+            <li><a class="dropdown-item" href="#">Change Password</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" onclick="logout()">Logout</a></li>
+          </ul>
+        </div>
       </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
-<!-- 🔹 DASHBOARD CONTENT -->
-<div class="container mt-4">
-  <h2 class="mb-4">Admin Dashboard</h2>
+  <!--  MAIN CONTENT -->
+  <div class="container mt-4">
+    <h2 class="mb-4">Admin Dashboard</h2>
 
- 
-
-<!-- 🔹 Notification Popup Modal -->
-<div class="modal fade" id="notifModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Notifications</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="notifList">
-        <p>No new notifications</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
- 
-
-  <!-- Content -->
-  <div class="content">
-
-   
-    <div class="row mt-4" style="padding-bottom: 50px;">
+    <!--  DASHBOARD SUMMARY -->
+    <div class="row mt-4">
       <div class="col-md-3">
         <div class="card summary-card p-3 text-center bg-primary text-white">
-          <h4>120</h4>
+          <h4 id="totalWorkers">0</h4>
           <p>Total Workers</p>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card summary-card p-3 text-center bg-success text-white">
-          <h4>95</h4>
+          <h4 id="presentToday">0</h4>
           <p>Present Today</p>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card summary-card p-3 text-center bg-danger text-white">
-          <h4>25</h4>
+          <h4 id="absentToday">0</h4>
           <p>Absent</p>
         </div>
       </div>
       <div class="col-md-3">
         <div class="card summary-card p-3 text-center bg-warning text-dark">
-          <h4>3</h4>
+          <h4 id="pendingApprovals">0</h4>
           <p>Pending Approvals</p>
         </div>
       </div>
     </div>
-    <div class="card mb-4">
-    <div class="card-header">Attendance Overview</div>
-    <div class="card-body">
-      <input type="date" id="attendanceDate">
-      <button class="btn btn-success" onclick="fetchAttendance()">Get Attendance</button>
-      <div id="attendanceReport" class="mt-3"></div>
+
+    <!-- GLOBAL ATTENDANCE -->
+    <div class="card mt-4 mb-4">
+      <div class="card-header">Global Attendance</div>
+      <div class="card-body">
+        <input type="date" id="attendanceDate" class="form-control w-auto d-inline">
+        <button class="btn btn-info ms-2" onclick="fetchAttendance()">Get Attendance</button>
+        <table class="table mt-3">
+          <thead><tr><th>Name</th><th>Role</th><th>Site</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead>
+          <tbody id="attendanceTable"></tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</div>
-    <div class="mt-5" style="padding-top: 0px;">
+
+    <!-- PENDING APPROVALS -->
+    <div class="mt-5">
       <h4>Pending Approvals</h4>
-      <table class="table table-bordered">
+      <table class="table table-bordered" id="pendingTable">
         <thead class="table-secondary">
-          <tr>
-            <th>Worker</th>
-            <th>Request Type</th>
-            <th>Date</th>
-            <th>Action</th>
-          </tr>
+          <tr><th>ID</th><th>Name</th><th>Site</th><th>Role</th><th>Action</th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>Arjun R</td>
-            <td>Manual Check-Out</td>
-            <td>2025-10-13</td>
-            <td>
-              <button class="btn btn-success btn-sm">Approve</button>
-              <button class="btn btn-danger btn-sm">Reject</button>
-            </td>
-          </tr>
+        <tbody id="pendingBody">
+          <tr><td colspan="5" class="text-center">Loading...</td></tr>
         </tbody>
       </table>
     </div>
+
+    <!--  WORKER MANAGEMENT -->
     <div class="mt-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4>Worker Management</h4>
-        <a href="AddWorkers.html" target="_self"><button class="btn btn-primary" href="AddWorkers.html">+ Add Worker</button></a>
+        <a href="AddWorkers.html"><button class="btn btn-primary">+ Add Worker</button></a>
       </div>
       <table class="table table-bordered table-striped">
         <thead class="table-dark">
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Site</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
+          <tr><th>ID</th><th>Name</th><th>Site</th><th>Role</th><th>Status</th><th>Action</th></tr>
         </thead>
-        <tbody>
-          <tr>
-            <td id="id">1</td>
-            <td id="name">Ravi Kumar</td>
-            <td id="site">Metro Project</td>
-            <td id="role">Worker</td>
-            <td id="status">Active</td>
-            <td>
-  <button class="btn btn-sm btn-warning" onclick="editWorker(1)">Edit</button>
-  <button class="btn btn-sm btn-danger" onclick="deleteWorker(1)">Delete</button>
-</td>
-
-          </tr>
-        </tbody>
+        <tbody id="workerBody"><tr><td colspan="6" class="text-center">Loading...</td></tr></tbody>
       </table>
     </div>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  // 🔹 Fetch workers and display them in the table
-async function loadWorkers() {
-  try {
-    const res = await fetch("http://localhost:3000/get-workers");
-    const workers = await res.json();
+ 
+  <div class="modal fade" id="notifModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header"><h5 class="modal-title">Notifications</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+        <div class="modal-body" id="notifList"><p>No new notifications</p></div>
+      </div>
+    </div>
+  </div>
 
-    const tableBody = document.querySelector("table.table.table-bordered.table-striped tbody");
-    tableBody.innerHTML = ""; // clear existing rows
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+   
+    window.onload = function() {
+      loadWorkers();
+      loadPending();
+      loadDashboardStats();
+    };
+    async function loadWorkers() {
+      try {
+        const res = await fetch("http://localhost:3000/get-workers");
+        const workers = await res.json();
+        const tbody = document.getElementById("workerBody");
+        tbody.innerHTML = "";
 
-    workers.forEach((w) => {
-      const row = `
-        <tr>
-          <td>${w.worker_id}</td>
-          <td>${w.name}</td>
-          <td>${w.site}</td>
-          <td>${w.role}</td>
-          <td>${w.status}</td>
-          <td>
-            <button class="btn btn-sm btn-warning" onclick="editWorker(${w.worker_id})">Edit</button>
-            <button class="btn btn-sm btn-danger" onclick="deleteWorker(${w.worker_id})">Delete</button>
-          </td>
-        </tr>
-      `;
-      tableBody.insertAdjacentHTML("beforeend", row);
-    });
-  } catch (error) {
-    console.error("⚠️ Error loading workers:", error);
-  }
-}
+        if (!workers.length) {
+          tbody.innerHTML = `<tr><td colspan="6" class="text-center">No workers found</td></tr>`;
+          return;
+        }
 
-function editWorker(id) {
-  window.location.href = `editWorker.html?id=${id}`;
-}
-// 🔹 Delete worker (optional)
-// 🗑️ Delete Worker Function
-async function deleteWorker(workerId) {
-  if (!confirm("Are you sure you want to delete this worker?")) return;
-
-  try {
-    const res = await fetch(`http://localhost:3000/delete-worker/${workerId}`, {
-      method: "DELETE",
-    });
-
-    if (res.ok) {
-      alert("✅ Worker deleted successfully!");
-      location.reload(); // reload page to refresh worker list
-    } else {
-      const text = await res.text();
-      alert("❌ Failed to delete worker: " + text);
+        workers.forEach(w => {
+          tbody.insertAdjacentHTML("beforeend", `
+            <tr>
+              <td>${w.worker_id}</td>
+              <td>${w.name}</td>
+              <td>${w.site}</td>
+              <td>${w.role}</td>
+              <td>${w.status}</td>
+              <td>
+                <button class="btn btn-warning btn-sm" onclick="editWorker(${w.worker_id})">Edit</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteWorker(${w.worker_id})">Delete</button>
+              </td>
+            </tr>
+          `);
+        });
+      } catch (err) {
+        console.error(" Error loading workers:", err);
+      }
     }
-  } catch (err) {
-    console.error("Error:", err);
-    alert("⚠️ Error connecting to server.");
+
+    // Delete Worker
+    async function deleteWorker(id) {
+      if (!confirm("Are you sure you want to delete this worker?")) return;
+      try {
+        const res = await fetch(`http://localhost:3000/delete-worker/${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (res.ok) { alert(data.message); loadWorkers(); }
+        else alert("Failed: " + data.error);
+      } catch (err) {
+        alert("Server error.");
+      }
+    }
+
+    function editWorker(id) { window.location.href = `editWorker.html?id=${id}`; }
+
+    // Load Pending Approvals
+    async function loadPending() {
+      try {
+        const res = await fetch("http://localhost:3000/pending-approvals");
+        const data = await res.json();
+        const tbody = document.getElementById("pendingBody");
+        tbody.innerHTML = "";
+
+        if (!data.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center">No pending approvals</td></tr>`;
+          document.getElementById("notifCount").innerText = "0";
+          document.getElementById("pendingApprovals").innerText = "0";
+          return;
+        }
+
+        document.getElementById("notifCount").innerText = data.length;
+        document.getElementById("pendingApprovals").innerText = data.length;
+
+        data.forEach(w => {
+          tbody.insertAdjacentHTML("beforeend", `
+            <tr>
+              <td>${w.worker_id}</td>
+              <td>${w.name}</td>
+              <td>${w.site}</td>
+              <td>${w.role}</td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="approveWorker(${w.worker_id})">Approve</button>
+                <button class="btn btn-danger btn-sm" onclick="rejectWorker(${w.worker_id})">Reject</button>
+              </td>
+            </tr>
+          `);
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function approveWorker(id) {
+      await fetch(`http://localhost:3000/approve-worker/${id}`, { method: "PUT" });
+      alert("Worker Approved");
+      loadPending(); loadWorkers(); loadDashboardStats();
+    }
+
+    async function rejectWorker(id) {
+      await fetch(`http://localhost:3000/reject-worker/${id}`, { method: "PUT" });
+      alert("Worker Rejected");
+      loadPending(); loadWorkers(); loadDashboardStats();
+    }
+
+    //  Attendance Fetch
+    async function fetchAttendance() {
+      const date = document.getElementById("attendanceDate").value;
+      const tbody = document.getElementById("attendanceTable");
+      tbody.innerHTML = "";
+      try {
+        const res = await fetch(`http://localhost:3000/global-attendance?date=${date}`);
+        const data = await res.json();
+        if (!data.length) {
+          tbody.innerHTML = "<tr><td colspan='6'>No attendance data found.</td></tr>";
+          return;
+        }
+        data.forEach(a => {
+          tbody.insertAdjacentHTML("beforeend", `
+            <tr>
+              <td>${a.name || "-"}</td>
+              <td>${a.role || "-"}</td>
+              <td>${a.site || "-"}</td>
+              <td>${a.checkin_time || "-"}</td>
+              <td>${a.checkout_time || "-"}</td>
+              <td>${a.status || "-"}</td>
+            </tr>
+          `);
+        });
+      } catch (err) { console.error("Attendance error:", err); }
+    }
+
+  async function loadDashboardStats() {
+  try {
+    const res = await fetch("http://localhost:3000/dashboard-stats");
+    const stats = await res.json();
+
+    document.getElementById("totalWorkers").innerText = stats.totalWorkers ?? 0;
+    document.getElementById("presentToday").innerText = stats.presentToday ?? 0;
+    document.getElementById("absentToday").innerText = stats.absentToday ?? 0;
+    document.getElementById("pendingApprovals").innerText = stats.pendingApprovals ?? 0;
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
   }
 }
+    document.getElementById("notifBtn").addEventListener("click", () => {
+      new bootstrap.Modal(document.getElementById("notifModal")).show();
+    });
 
-
-// Load data when page opens
-window.onload = loadWorkers;
-
-// Notification Modal
-document.getElementById("notifBtn").addEventListener("click", () => {
-  new bootstrap.Modal(document.getElementById("notifModal")).show();
-});
-
-// Logout
-function logout() {
-  alert("Logged out!");
-  window.location.href = "MainInterface.html";
-}
-
-// Example attendance fetch
-function fetchAttendance() {
-  const date = document.getElementById("attendanceDate").value;
-  alert("Fetching attendance for: " + date);
-}
-</script>
+    function logout() {
+      alert("Logged out successfully!");
+      window.location.href = "MainInterface.html";
+    }
+    
+  </script>
 </body>
 </html>
