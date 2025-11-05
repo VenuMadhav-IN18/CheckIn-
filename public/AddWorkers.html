@@ -78,7 +78,7 @@ document.getElementById("addWorker").addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch("http://localhost:3000/add-worker", {
+    const res = await fetch("https://checkin-production-176a.up.railway.app/add-worker", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
