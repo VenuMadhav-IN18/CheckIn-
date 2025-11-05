@@ -2,7 +2,7 @@
 
 **CheckIn+** is a smart attendance and workforce management system designed to simplify check-ins, track worker activity, and manage roles like Super Admin, Admin, and Workers.  
 This version focuses on the **frontend and basic structure** using HTML, CSS, and JavaScript.
-**Backend** using Node.js,Express.js **DataBase** Mysql.
+**Backend** using Node.js,Express.js **DataBase** Mangodb.
 
 ---
 
@@ -93,7 +93,7 @@ Workers are regular users who interact with the system primarily to log their at
 ## 🧩 Folder Structure
 
 CheckIn+/
-├── db/
+├── config/
 │ └── db.js
 ├── public/
 │ ├── css/
